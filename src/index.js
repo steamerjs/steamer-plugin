@@ -12,14 +12,15 @@ export default class SteamerPlugin {
 		this.fs = fs;
 		this.chalk = chalk;
 		this._ = _;
+		this.pluginName = _.kebabCase(SteamerPlugin.name);
 	}
 
 	init() {
-
+		this.warn('You do not write any ini logics.');
 	}
 
 	help() {
-		
+		this.warn('You do not add any help content.');
 	}
 
 	version() {
@@ -39,7 +40,7 @@ export default class SteamerPlugin {
 
 		let globalModules = require('global-modules');
 
-		if (fs.existsSync(globalModules)) {
+		if (this.fs.existsSync(globalModules)) {
 			return globalModules;
 		}
 
@@ -60,10 +61,7 @@ export default class SteamerPlugin {
 	 * @param  {Object} config [config object]
 	 * @param  {Object} option [options]
 	 */
-	createConfig(config, option) {
-		var config = config || '',
-			option = option || {};
-
+	createConfig(config = {}, option = {}) {
 		// config file path: [folder]./steamer/[filename].[extension]
 		var folder = (option.isGlobal) ? this.getGlobalHome() : (option.folder || process.cwd()),
 			filename = option.filename || this.pluginName,
@@ -72,7 +70,7 @@ export default class SteamerPlugin {
 
 		var configFile = path.resolve(path.join(folder, '.steamer/' + filename + '.' + extension));
 
-		if (!overwrite && fs.existsSync(configFile)) {
+		if (!overwrite && this.fs.existsSync(configFile)) {
 			throw new Error(configFile + ' exists');
 		}
 
@@ -86,9 +84,7 @@ export default class SteamerPlugin {
 	 * @param  {Object} config [config object]
 	 * @param  {Object} option [options]
 	 */
-	readConfig(option) {
-		var option = option || {};
-
+	readConfig(option = {}) {
 		var folder = option.folder || process.cwd(),
 			filename = option.filename || this.pluginName,
 			extension = option.extension || 'js';
@@ -109,36 +105,15 @@ export default class SteamerPlugin {
 	 * @return {Object}           [steamer config]
 	 */
 	readSteamerConfig() {
-		var globalConfig = this.readSteamerLocalConfig(),
-			localConfig = this.readSteamerGlobalConfig();
+		let localConfigFile = path.join(process.cwd(), '.steamer/steamer.js'),
+			globalConfigFile = path.join(this.getGlobalHome(), '.steamer/steamer.js');
+
+		let localConfig = this._readFile(localConfigFile),
+			globalConfig = this._readFile(globalConfigFile);
 
 		var config = _.merge({}, globalConfig, localConfig);
 
 		return config;
-	}
-
-	/**
-	 * read steamerjs local config
-	 * @return {Object} [steamer local config]
-	 */
-	readSteamerLocalConfig() {
-		var localConfigFile = path.join(process.cwd(), '.steamer/steamer.js');
-
-		var localConfig = this._readFile(localConfigFile);
-
-		return localConfig;
-	}
-
-	/**
-	 * read steamerjs global config
-	 * @return {Object} [steamer global config]
-	 */
-	readSteamerGlobalConfig() {
-		var globalConfigFile = path.join(this.getGlobalHome(), '.steamer/steamer.js');
-
-		var globalConfig = this._readFile(globalConfigFile);
-
-		return globalConfig;
 	}
 
 	/**
@@ -154,10 +129,9 @@ export default class SteamerPlugin {
 		var configFile = path.join(folder, '.steamer/steamer.js');
 
 		try {
-			if (!overwrite && fs.existsSync(configFile)) {
+			if (!overwrite && this.fs.existsSync(configFile)) {
 				throw new Error(configFile + ' exists');
 			}
-
 			this._writeFile(configFile, 'steamerjs', config);
 		}
 		catch (e) {
@@ -172,23 +146,20 @@ export default class SteamerPlugin {
 	 * @return {Object}           [config object]
 	 */
 	_readFile(filepath) {
-		var extension = path.extname(filepath);
-
-		var isJs = extension === '.js',
-			config = {};
+		var config = {};
 
 		try {
-			if (isJs) {
-				if (require.cache[filepath]) {
-					delete require.cache[filepath];
+			if (require.cache[filepath]) {
+				delete require.cache[filepath];
+			}
+
+			Object.keys(require.cache).forEach(function(key) {
+				if (key.includes(filepath)) {
+					delete require.cache[key];
 				}
+			});
 
-				config = require(filepath) || {};
-			}
-			else {
-				config = JSON.parse(fs.readFileSync(filepath, 'utf-8')) || {};
-			}
-
+			config = require(filepath) || {};
 			config = config.config;
 		}
 		catch (e) {
@@ -215,8 +186,8 @@ export default class SteamerPlugin {
 			content = contentPrefix + JSON.stringify(newConfig, null, 4) + contentPostfix;
 
 		try {
-			fs.ensureFileSync(filepath);
-			fs.writeFileSync(filepath, content, 'utf-8');
+			this.fs.ensureFileSync(filepath);
+			this.fs.writeFileSync(filepath, content, 'utf-8');
 		}
 		catch (e) {
 			throw e;
