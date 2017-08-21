@@ -149,15 +149,11 @@ export default class SteamerPlugin {
 		var config = {};
 
 		try {
+			// 获取真实路径
+			filepath = fs.realpathSync(filepath);
 			if (require.cache[filepath]) {
 				delete require.cache[filepath];
 			}
-
-			Object.keys(require.cache).forEach(function(key) {
-				if (key.includes(filepath)) {
-					delete require.cache[key];
-				}
-			});
 
 			config = require(filepath) || {};
 			config = config.config;
