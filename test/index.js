@@ -1,185 +1,184 @@
 'use strict';
 
 const path = require('path'),
-	os = require('os'),
-	fs = require('fs-extra'),
-	chalk = require('chalk'),
-	expect = require('chai').expect,
-	sinon = require('sinon'),
-	globalModules = require('global-modules');
+    os = require('os'),
+    fs = require('fs-extra'),
+    chalk = require('chalk'),
+    expect = require('chai').expect,
+    sinon = require('sinon'),
+    globalModules = require('global-modules');
 
 const Plugin = require('../dist/index').default;
 
 describe('get paths', function() {
-	it('getGlobalModules - NODE_PATH not set', function() {
-		let NODE_PATH = process.env.NODE_PATH;
+    it('getGlobalModules - NODE_PATH not set', function() {
+        let NODE_PATH = process.env.NODE_PATH;
 
-		process.env.NODE_PATH = '';
+        process.env.NODE_PATH = '';
 
-		var plugin = new Plugin();
+        var plugin = new Plugin();
 
-		expect(globalModules).to.equal(plugin.getGlobalModules());
+        expect(globalModules).to.equal(plugin.getGlobalModules());
 
-		process.env.NODE_PATH = NODE_PATH;
-	});
+        process.env.NODE_PATH = NODE_PATH;
+    });
 
-	it('getGlobalModules - NODE_PATH set', function() {
-		let NODE_PATH = process.env.NODE_PATH;
+    it('getGlobalModules - NODE_PATH set', function() {
+        let NODE_PATH = process.env.NODE_PATH;
 
-		process.env.NODE_PATH = '/Users/steamer/';
+        process.env.NODE_PATH = '/Users/steamer/';
 
-		var plugin = new Plugin();
+        var plugin = new Plugin();
 
-		expect(process.env.NODE_PATH).to.equal(plugin.getGlobalModules());
+        expect(process.env.NODE_PATH).to.equal(plugin.getGlobalModules());
 
-		process.env.NODE_PATH = NODE_PATH;
-	});
+        process.env.NODE_PATH = NODE_PATH;
+    });
 
-	it('getGlobalHome', function() {
-		var plugin = new Plugin();
+    it('getGlobalHome', function() {
+        var plugin = new Plugin();
 
-		expect(os.homedir()).to.equal(plugin.getGlobalHome());
-	});
+        expect(os.homedir()).to.equal(plugin.getGlobalHome());
+    });
 });
 
 describe.only('config', function() {
+    var globalConfig = {};
 
-	var globalConfig = {};
+    before(function() {
+        fs.writeFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-abc.js'));
+        fs.writeFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-bcd.js'));
+    });
 
-	before(function() {
-		fs.writeFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-abc.js'));
-		fs.writeFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-bcd.js'));
-	});
+    after(function() {
+        fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin.js'));
+        // fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-xxx.json'));
+        fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-abc.js'));
+        fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-bcd.js'));
+        fs.removeSync(path.join(process.cwd(), '.steamer/steamer.js'));
+    });
 
-	after(function() {
-		fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin.js'));
-		fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-xxx.json'));
-		fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-abc.js'));
-		fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-bcd.js'));
-		fs.removeSync(path.join(process.cwd(), '.steamer/steamer.js'));
-	});
+    it('create and read - default', function() {
+        var plugin = new Plugin(),
+            config = {
+                a: 1,
+                b: 2
+            };
 
-	it('create and read - default', function() {
+        plugin.createConfig(config);
 
-		var plugin = new Plugin(),
-			config = {
-				a: 1,
-				b: 2
-			};
+        expect(plugin.readConfig()).deep.eql(config);
+    });
 
-		plugin.createConfig(config);
+    it('create and read - json', function() {
+        var plugin = new Plugin(),
+            config = {
+                a: 1,
+                b: 2
+            },
+            options = {
+                filename: 'steamer-plugin-xxx',
+                extension: 'json'
+            };
 
-		expect(plugin.readConfig()).deep.eql(config);
+        // stub ensureFileSync , not to create file
+        sinon.stub(plugin.fs, 'ensureFileSync').returnsArg(0);
+        // stub writeFileSync, not to implement writeFile
+        let stub = sinon.stub(plugin.fs, 'writeFileSync').returnsArg(0);
 
-	});
+        plugin.createConfig(config, options);
+		// match function called params
+        expect(stub.calledWithMatch(sinon.match(/steamer-plugin-xx/gi), sinon.match(/module.exports/gi)));
+        stub.restore();
+    });
 
-	it('create and read - json', function() {
+    it('create and read - file exist', function() {
+        var plugin = new Plugin(),
+            config = {
+                a: 1,
+                b: 2
+            },
+            options = {
+                filename: 'steamer-plugin-abc'
+            };
 
-		var plugin = new Plugin(),
-			config = {
-				a: 1,
-				b: 2
-			},
-			options = {
-				filename: 'steamer-plugin-xxx',
-				extension: 'json'
-			};
+        expect(function() {
+            plugin.createConfig(config, options);
+        }).to.throw();
+    });
 
-		plugin.createConfig(config, options);
+    it('create and read - file exist but overwrite', function() {
+        var plugin = new Plugin(),
+            config = {
+                a: 1,
+                b: 2
+            },
+            options = {
+                filename: 'steamer-plugin-bcd',
+                overwrite: true
+            };
 
-		expect(plugin.readConfig(options)).deep.eql(config);
-	});
+        plugin.createConfig(config, options);
 
-	it('create and read - file exist', function() {
+        expect(plugin.readConfig(options)).deep.eql(config);
+    });
 
-		var plugin = new Plugin(),
-			config = {
-				a: 1,
-				b: 2
-			},
-			options = {
-				filename: 'steamer-plugin-abc',
-			};
+    it('create and read - global and local', function() {
+        var plugin = new Plugin(),
+            config = {
+                a: 1,
+                b: 2
+            },
+            options = {
+                filename: 'steamer-plugin-def',
+                overwrite: true
+            };
 
-		expect(function() {
-			plugin.createConfig(config, options);
-		}).to.throw();
-	});
+        plugin.createConfig(config, options);
 
-	it('create and read - file exist but overwrite', function() {
+        config.a = 3;
+        config.c = 3;
+        options.isGlobal = true;
 
-		var plugin = new Plugin(),
-			config = {
-				a: 1,
-				b: 2
-			},
-			options = {
-				filename: 'steamer-plugin-bcd',
-				overwrite: true,
-			};
+        plugin.createConfig(config, options);
 
-		plugin.createConfig(config, options);
+        expect(plugin.readConfig(options)).deep.eql({
+            a: 1,
+            b: 2,
+            c: 3
+        });
 
-		expect(plugin.readConfig(options)).deep.eql(config);
-	});
+        fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-def.js'));
+        fs.removeSync(path.join(plugin.getGlobalHome(), '.steamer/steamer-plugin-def.js'));
+    });
 
-	it('create and read - global and local', function() {
+    it('steamer config create and read - global and local', function() {
+        var plugin = new Plugin();
 
-		var plugin = new Plugin(),
-			config = {
-				a: 1,
-				b: 2
-			},
-			options = {
-				filename: 'steamer-plugin-def',
-				overwrite: true
-			};
+        // backup global steamer config
+        globalConfig = plugin._readFile(path.join(plugin.getGlobalHome(), '.steamer/steamer.js'));
 
-		plugin.createConfig(config, options);
+        var config = {
+                a: 1,
+                b: 2
+            },
+            options = {
+                overwrite: true
+            };
 
-		config.a = 3;
-		config.c = 3;
-		options.isGlobal = true;
+        plugin.createSteamerConfig(config, options);
 
-		plugin.createConfig(config, options);
+        config.a = 3;
+        config.c = 3;
+        options.isGlobal = true;
+        plugin.createSteamerConfig(config, options);
 
-		expect(plugin.readConfig(options)).deep.eql({
-			a: 1,
-			b: 2,
-			c: 3
-		});
+        expect(plugin.readSteamerConfig()).deep.eql({
+            a: 1,
+            b: 2,
+            c: 3
+        });
 
-		fs.removeSync(path.join(process.cwd(), '.steamer/steamer-plugin-def.js'));
-		fs.removeSync(path.join(plugin.getGlobalHome(), '.steamer/steamer-plugin-def.js'));
-	});
-
-	it('steamer config create and read - global and local', function() {
-		var plugin = new Plugin();
-
-		// backup global steamer config
-		globalConfig = plugin._readFile(path.join(plugin.getGlobalHome(), '.steamer/steamer.js'));
-
-		var config = {
-				a: 1,
-				b: 2
-			},
-			options = {
-				overwrite: true
-			};
-
-		plugin.createSteamerConfig(config, options);
-
-		config.a = 3;
-		config.c = 3;
-		options.isGlobal = true;
-		plugin.createSteamerConfig(config, options);
-
-		expect(plugin.readSteamerConfig()).deep.eql({
-			a: 1,
-			b: 2,
-			c: 3
-		});
-
-		plugin.createSteamerConfig(globalConfig, options);
-	});
+        plugin.createSteamerConfig(globalConfig, options);
+    });
 });
