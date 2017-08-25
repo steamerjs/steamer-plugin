@@ -247,17 +247,6 @@ describe.only('print things: ', function() {
     log.restore();
   });
 
-  it('printUsage', function() {
-    utils.printUsage('des');
-    var msg = chalk.green('\nusage: \n');
-
-    msg += chalk.cyan('steamer steamer-plugin' + '    ' + 'des' + '\n');
-
-    expect(console.info.calledOnce).to.be.true;
-    expect(console.info.calledWith(msg)).to.be.true;
-    log.restore();
-  });
-
   it('printOption', function() {
     let msg = [
       {
@@ -293,6 +282,17 @@ describe.only('print things: ', function() {
 
     expect(console.info.calledOnce).to.be.true;
     // expect(console.info.calledWith(msg)).to.be.true;
+    log.restore();
+  });
+
+  it('printUsage', function() {
+    utils.printUsage('des');
+    var msg = chalk.green('\nusage: \n');
+
+    msg += chalk.cyan('steamer steamer-plugin' + '    ' + 'des' + '\n');
+
+    expect(console.info.calledOnce).to.be.true;
+    expect(console.info.calledWith(msg)).to.be.true;
     log.restore();
   });
 });
