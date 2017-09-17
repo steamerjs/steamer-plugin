@@ -13,7 +13,7 @@ export default class SteamerPlugin {
 		this.chalk = chalk;
 		this._ = _;
 		this.pluginName = _.kebabCase(SteamerPlugin.name);
-	}
+	} 
 
 	init() {
 		this.warn('You do not write any ini logics.');
@@ -75,8 +75,6 @@ export default class SteamerPlugin {
 		}
 
 		this._writeFile(configFile, filename, config);
-
-		this.config = null;
 	}
 
 	/**
@@ -85,48 +83,52 @@ export default class SteamerPlugin {
 	 * @param  {Object} option [options]
 	 */
 	readConfig(option = {}) {
-		var folder = option.folder || process.cwd(),
+		let folder = option.folder || process.cwd(),
 			filename = option.filename || this.pluginName,
-			extension = option.extension || 'js';
+			extension = option.extension || 'js',
+			isGlobal = option.isGlobal || false;
 
-		var globalConfigFile = path.resolve(path.join(this.getGlobalHome(), '.steamer/' + filename + '.' + extension)),
-			localConfigFile = path.resolve(path.join(folder, '.steamer/' + filename + '.' + extension));
+		let globalConfigFile = path.resolve(path.join(this.getGlobalHome(), '.steamer/' + filename + '.' + extension)),
+			globalConfig = this._readFile(globalConfigFile);
 
-		var globalConfig = this._readFile(globalConfigFile),
-			localConfig = this._readFile(localConfigFile);
+		if (isGlobal) {
+			return globalConfig;
+		}
 
-		this.config = _.merge({}, globalConfig, localConfig);
+		let localConfigFile = path.resolve(path.join(folder, '.steamer/' + filename + '.' + extension)),
+		localConfig = this._readFile(localConfigFile);
 
-		return this.config;
+		return _.merge({}, globalConfig, localConfig);
 	}
 
 	/**
 	 * read steamerjs config, local config extensd global config
 	 * @return {Object}           [steamer config]
 	 */
-	readSteamerConfig() {
-		let localConfigFile = path.join(process.cwd(), '.steamer/steamer.js'),
-			globalConfigFile = path.join(this.getGlobalHome(), '.steamer/steamer.js');
+	readSteamerConfig(option = {}) {
+		let isGlobal = option.isGlobal || false;
 
-		let localConfig = this._readFile(localConfigFile),
+		let globalConfigFile = path.join(this.getGlobalHome(), '.steamer/steamer.js'),
 			globalConfig = this._readFile(globalConfigFile);
 
-		var config = _.merge({}, globalConfig, localConfig);
+		if (isGlobal) {
+			return globalConfig;
+		}
 
-		return config;
+		let localConfigFile = path.join(process.cwd(), '.steamer/steamer.js'),
+			localConfig = this._readFile(localConfigFile);
+
+		return _.merge({}, globalConfig, localConfig);
 	}
 
 	/**
 	 * create steamerjs config
 	 */
-	createSteamerConfig(config, options) {
-		var config = config || {},
-			options = options || {};
-
-		var folder = (options.isGlobal) ? this.getGlobalHome() : process.cwd(),
+	createSteamerConfig(config = {}, options = {}) {
+		let folder = (options.isGlobal) ? this.getGlobalHome() : process.cwd(),
 			overwrite = options.overwrite || false;
 
-		var configFile = path.join(folder, '.steamer/steamer.js');
+		let configFile = path.join(folder, '.steamer/steamer.js');
 
 		try {
 			if (!overwrite && this.fs.existsSync(configFile)) {
@@ -146,7 +148,7 @@ export default class SteamerPlugin {
 	 * @return {Object}           [config object]
 	 */
 	_readFile(filepath) {
-		var config = {};
+		let config = {};
 
 		try {
 			// 获取真实路径
@@ -171,8 +173,8 @@ export default class SteamerPlugin {
 	 * @param  {Object|String}          [config content]
 	 */
 	_writeFile(filepath, plugin, config) {
-		var extension = path.extname(filepath);
-		var isJs = extension === '.js',
+		let extension = path.extname(filepath);
+		let isJs = extension === '.js',
 			newConfig = {
 				plugin: plugin,
 				config: config
@@ -218,7 +220,7 @@ export default class SteamerPlugin {
 	 * @param str
 	 */
 	info(str) {
-		this.log(cyan, 'red');
+		this.log(str, 'cyan');
 	}
 
 	/**
