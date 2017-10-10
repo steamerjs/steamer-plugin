@@ -203,15 +203,15 @@ describe('[config]', function() {
 	});
 });
 
-describe.only('[log]', function() {
+describe('[log]', function() {
 	let log,
 	 	plugin = new Plugin();
 
-	before(function() {
+	beforeEach(function() {
 		log = sinon.stub(console, 'info');
 	});
 
-	after(function() {
+	afterEach(function() {
 		log.restore();
 	});
 	
@@ -247,4 +247,75 @@ describe.only('[log]', function() {
 		expect(console.info.calledWith(msg)).to.be.eql(true);
 	});
 
+	it('printTitle', function() {
+		plugin.printTitle('test3', 'white');
+
+	  	var str = ' test3 ',
+		  	len = str.length,
+		  	maxLen = process.stdout.columns || 84;
+
+	  	var padding = '='.repeat(Math.floor((maxLen - len) / 2));
+
+	  	expect(console.info.calledOnce).to.be.eql(true);
+	  	expect(console.info.calledWith(chalk['white'](padding + str + padding))).to.be.eql(true);
+	});
+
+	it('printEnd', function() {
+		plugin.printEnd('white');
+
+		var maxLen = process.stdout.columns || 84;
+
+	  	expect(console.info.calledOnce).to.be.eql(true);
+	  	expect(console.info.calledWith(chalk['white']('='.repeat(maxLen)))).to.be.eql(true);
+	});
+
+	it('printUsage', function() {
+		var des = 123;
+
+		plugin.printUsage(des, 'test3');
+
+		var msg = chalk.green('\nusage: \n');
+		
+		msg += 'steamer test3    ' + des + '\n';
+
+	  	expect(console.info.calledOnce).to.be.eql(true);
+	  	expect(console.info.calledWith(chalk['cyan'](msg))).to.be.eql(true);
+	});
+
+	it('printOption', function() {
+		
+		plugin.printOption([
+			{
+				option: 'del',
+				alias: 'd',
+				description: 'delete file'
+			},
+			{
+				option: 'add',
+				alias: 'a',
+				description: 'add file'
+			},
+			{
+				option: 'config',
+				alias: 'c',
+				description: 'set config'
+			},
+			{
+				option: 'init',
+				alias: 'i',
+				value: '<kit name>',
+				description: 'init starter kit name'
+			},
+			{
+				option: 'random',
+				alias: 'r',
+				value: '<123123123123123123>',
+				description: '1231231231231231231231231231231231231231231231231'
+							 + '23123123123123123123123123123123123123123'
+			}
+		]);
+		
+		expect(console.info.calledOnce).to.be.eql(true);
+		// expect(console.log.calledWith(msg)).to.be.eql(true);
+	});
 });
