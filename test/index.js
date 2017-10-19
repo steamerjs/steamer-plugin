@@ -46,8 +46,8 @@ describe('[config]', function() {
 	var globalConfig = {};
 
 	before(function() {
-		fs.writeFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-abc.js'));
-		fs.writeFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-bcd.js'));
+		fs.ensureFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-abc.js'));
+		fs.ensureFileSync(path.join(process.cwd(), '.steamer/steamer-plugin-bcd.js'));
 	});
 
 	after(function() {
