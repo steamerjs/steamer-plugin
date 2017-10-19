@@ -7,7 +7,7 @@ const os = require('os'),
 	  _ = require('lodash'),
 	  spawn = require('cross-spawn');
 
-export default class SteamerPlugin {
+class SteamerPlugin {
 	constructor() {
 		this.fs = fs;
 		this.chalk = chalk;
@@ -102,7 +102,7 @@ export default class SteamerPlugin {
 	}
 
 	/**
-	 * read steamerjs config, local config extensd global config
+	 * read steamerjs config, local config extends global config
 	 * @return {Object}           [steamer config]
 	 */
 	readSteamerConfig(option = {}) {
@@ -342,3 +342,5 @@ export default class SteamerPlugin {
 		this.info(msg);
 	};
 };
+
+module.exports = SteamerPlugin;

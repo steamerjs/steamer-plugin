@@ -8,7 +8,7 @@ const path = require('path'),
 	sinon = require('sinon'),
 	globalModules = require('global-modules');
 
-const Plugin = require('../dist/index').default;
+const Plugin = require('../index');
 
 describe('[get paths]', function() {
 	it('getGlobalModules - NODE_PATH not set', function() {
