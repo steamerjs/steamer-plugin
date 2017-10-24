@@ -34,7 +34,7 @@ class SteamerPlugin {
 	getGlobalModules() {
 		let env = process.env;
 
-		if (env.NODE_PATH) {
+		if (env.NODE_PATH && env.NODE_PATH !== 'undefined') {
 			return env.NODE_PATH;
 		}
 
