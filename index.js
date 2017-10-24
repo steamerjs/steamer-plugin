@@ -244,9 +244,8 @@ class SteamerPlugin {
 	 * @param  {String} color [color name]
 	 * @return {String}       [msg with color]
 	 */
-	printTitle(str, color) {
+	printTitle(str, color = 'white') {
 		var msg = '',
-			color = color || 'white',
 			str = ' ' + str + ' ',
 			len = str.length,
 			maxLen = process.stdout.columns || 84;
