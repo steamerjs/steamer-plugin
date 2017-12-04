@@ -1,12 +1,10 @@
-'use strict';
-
-const path = require('path'),
-	os = require('os'),
-	fs = require('fs-extra'),
-	chalk = require('chalk'),
-	expect = require('chai').expect,
-	sinon = require('sinon'),
-	globalModules = require('global-modules');
+const path = require('path');
+const os = require('os');
+const fs = require('fs-extra');
+const chalk = require('chalk');
+const expect = require('chai').expect;
+const sinon = require('sinon');
+const globalModules = require('global-modules');
 
 const Plugin = require('../index');
 
@@ -201,6 +199,49 @@ describe('[config]', function() {
 
 		plugin.createSteamerConfig(globalConfig, options);
 	});
+
+	it.only('readSteamerDefaultConfig - 1', function() {
+		var plugin = new Plugin();
+		
+		let stub1 = sinon.stub(plugin, 'readSteamerConfig').callsFake(() => {
+			return {
+				NPM: 'tnpm',
+				PLUGIN_PREFIX: 'at-plugin-',
+				KIT_PREFIX: 'at-kit-',
+				TEAM_PREFIX: 'at-team-'
+			};
+		});
+
+		expect(plugin.readSteamerDefaultConfig()).deep.eql({
+			NPM: 'tnpm',
+			PLUGIN_PREFIX: 'at-plugin-',
+			KIT_PREFIX: 'at-kit-',
+			TEAM_PREFIX: 'at-team-'
+		});
+
+		stub1.restore();
+	});
+
+	it.only('readSteamerDefaultConfig - 2', function() {
+		var plugin = new Plugin();
+		
+		let stub1 = sinon.stub(plugin, 'readSteamerConfig').callsFake(() => {
+			return {
+				GIT: 'github.com'
+			};
+		});
+
+		expect(plugin.readSteamerDefaultConfig()).deep.eql({
+			NPM: 'npm',
+			PLUGIN_PREFIX: 'steamer-plugin-',
+			KIT_PREFIX: 'steamer-kit-',
+			TEAM_PREFIX: 'steamer-team-',
+			GIT: 'github.com'
+		});
+
+		stub1.restore();
+	});
+	
 });
 
 describe('[log]', function() {

@@ -76,6 +76,17 @@
             - `option.overwrite`, `Boolean` 是否覆盖已经存在的配置文件
             - `option.isGlobal`, `Boolean` 是否全局
 
+* readSteamerDefaultConfig
+    - `Function`
+    - 读取 `steamerjs` 配置与默认配置的并集
+    - 默认值
+    ```javascript
+    NPM: 'npm',
+    PLUGIN_PREFIX: 'steamer-plugin-',
+    KIT_PREFIX: 'steamer-kit-',
+    TEAM_PREFIX: 'steamer-team-'
+    ```
+
 * readSteamerConfig
     - `Function`
     - 读取 `steamerjs` 配置
