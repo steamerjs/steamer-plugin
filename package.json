@@ -1,6 +1,6 @@
 {
   "name": "steamer-plugin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "steamer plugin base class",
   "main": "index.js",
   "scripts": {
@@ -26,18 +26,18 @@
   "homepage": "https://github.com/steamerjs/steamer-plugin#readme",
   "devDependencies": {
     "chai": "^4.1.1",
-    "eslint": "^4.5.0",
-    "eslint-config-alloy": "^1.2.1",
+    "eslint": "^4.18.1",
+    "eslint-config-alloy": "^1.4.1",
     "istanbul": "^0.4.5",
-    "mocha": "^4.0.1",
-    "sinon": "^4.0.1"
+    "mocha": "^5.0.1",
+    "sinon": "^4.4.2"
   },
   "dependencies": {
-    "chalk": "^2.3.0",
-    "cross-spawn": "^5.1.0",
-    "fs-extra": "^4.0.1",
+    "chalk": "^2.3.1",
+    "cross-spawn": "^6.0.4",
+    "fs-extra": "^5.0.0",
     "global-modules": "^1.0.0",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.5"
   },
   "engines": {
     "node": ">=6.4.0"
