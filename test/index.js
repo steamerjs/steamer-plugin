@@ -200,7 +200,7 @@ describe('[config]', function() {
 		plugin.createSteamerConfig(globalConfig, options);
 	});
 
-	it.only('readSteamerDefaultConfig - 1', function() {
+	it('readSteamerDefaultConfig - 1', function() {
 		var plugin = new Plugin();
 		
 		let stub1 = sinon.stub(plugin, 'readSteamerConfig').callsFake(() => {
@@ -222,7 +222,7 @@ describe('[config]', function() {
 		stub1.restore();
 	});
 
-	it.only('readSteamerDefaultConfig - 2', function() {
+	it('readSteamerDefaultConfig - 2', function() {
 		var plugin = new Plugin();
 		
 		let stub1 = sinon.stub(plugin, 'readSteamerConfig').callsFake(() => {
