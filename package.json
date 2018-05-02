@@ -1,6 +1,6 @@
 {
   "name": "steamer-plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "steamer plugin base class",
   "main": "index.js",
   "scripts": {
