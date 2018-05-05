@@ -62,16 +62,16 @@ class SteamerPlugin {
     }
 
     /**
-	 * Create config file
-	 * @param  {Object} config [config object]
-	 * @param  {Object} option [options]
-	 */
+     * Create config file
+     * @param  {Object} config [config object]
+     * @param  {Object} option [options]
+    */
     createConfig(config = {}, option = {}) {
         // config file path: [folder]./steamer/[filename].[extension]
-        let folder = (option.isGlobal) ? this.getGlobalHome() : (option.folder || process.cwd()),
-            filename = option.filename || this.pluginName,
-            extension = option.extension || 'js',
-            overwrite = option.overwrite || false; // overwrite the config file or not
+        let folder = (option.isGlobal) ? this.getGlobalHome() : (option.folder || process.cwd());
+        let filename = option.filename || this.pluginName;
+        let extension = option.extension || 'js';
+        let overwrite = option.overwrite || false; // overwrite the config file or not
 
         let configFile = path.resolve(path.join(folder, '.steamer/' + filename + '.' + extension));
 
@@ -88,20 +88,20 @@ class SteamerPlugin {
 	 * @param  {Object} option [options]
 	 */
     readConfig(option = {}) {
-        let folder = option.folder || process.cwd(),
-            filename = option.filename || this.pluginName,
-            extension = option.extension || 'js',
-            isGlobal = option.isGlobal || false;
+        let folder = option.folder || process.cwd();
+        let filename = option.filename || this.pluginName;
+        let extension = option.extension || 'js';
+        let isGlobal = option.isGlobal || false;
 
-        let globalConfigFile = path.resolve(path.join(this.getGlobalHome(), '.steamer/' + filename + '.' + extension)),
-            globalConfig = this._readFile(globalConfigFile);
+        let globalConfigFile = path.resolve(path.join(this.getGlobalHome(), '.steamer/' + filename + '.' + extension));
+        let globalConfig = this._readFile(globalConfigFile);
 
         if (isGlobal) {
             return globalConfig;
         }
 
-        let localConfigFile = path.resolve(path.join(folder, '.steamer/' + filename + '.' + extension)),
-            localConfig = this._readFile(localConfigFile);
+        let localConfigFile = path.resolve(path.join(folder, '.steamer/' + filename + '.' + extension));
+        let localConfig = this._readFile(localConfigFile);
 
         return _.merge({}, globalConfig, localConfig);
     }
@@ -113,15 +113,15 @@ class SteamerPlugin {
     readSteamerConfig(option = {}) {
         let isGlobal = option.isGlobal || false;
 
-        let globalConfigFile = path.join(this.getGlobalHome(), '.steamer/steamer.js'),
-            globalConfig = this._readFile(globalConfigFile);
+        let globalConfigFile = path.join(this.getGlobalHome(), '.steamer/steamer.js');
+        let globalConfig = this._readFile(globalConfigFile);
 
         if (isGlobal) {
             return globalConfig;
         }
 
-        let localConfigFile = path.join(process.cwd(), '.steamer/steamer.js'),
-            localConfig = this._readFile(localConfigFile);
+        let localConfigFile = path.join(process.cwd(), '.steamer/steamer.js');
+        let localConfig = this._readFile(localConfigFile);
 
         return _.merge({}, globalConfig, localConfig);
     }
@@ -137,8 +137,8 @@ class SteamerPlugin {
 	 * create steamerjs config
 	 */
     createSteamerConfig(config = {}, options = {}) {
-        let folder = (options.isGlobal) ? this.getGlobalHome() : process.cwd(),
-            overwrite = options.overwrite || false;
+        let folder = (options.isGlobal) ? this.getGlobalHome() : process.cwd();
+        let overwrite = options.overwrite || false;
 
         let configFile = path.join(folder, '.steamer/steamer.js');
 
@@ -186,14 +186,14 @@ class SteamerPlugin {
 	 */
     _writeFile(filepath, plugin, config) {
         let extension = path.extname(filepath);
-        let isJs = extension === '.js',
-            newConfig = {
-                plugin: plugin,
-                config: config
-            },
-            contentPrefix = (isJs) ? 'module.exports = ' : '',
-            contentPostfix = (isJs) ? ';' : '',
-            content = contentPrefix + JSON.stringify(newConfig, null, 4) + contentPostfix;
+        let isJs = extension === '.js';
+        let newConfig = {
+            plugin: plugin,
+            config: config
+        };
+        let contentPrefix = (isJs) ? 'module.exports = ' : '';
+        let contentPostfix = (isJs) ? ';' : '';
+        let content = contentPrefix + JSON.stringify(newConfig, null, 4) + contentPostfix;
 
         try {
             this.fs.ensureFileSync(filepath);
@@ -256,11 +256,11 @@ class SteamerPlugin {
 	 * @param  {String} color [color name]
 	 * @return {String}       [msg with color]
 	 */
-    printTitle(str, color = 'white') {
-        var msg = '',
-            str = ' ' + str + ' ',
-            len = str.length,
-            maxLen = process.stdout.columns || 84;
+    printTitle(strParam, color = 'white') {
+        let msg = '';
+        let str = ' ' + strParam + ' ';
+        let len = str.length;
+        let maxLen = process.stdout.columns || 84;
 
         let padding = '='.repeat(Math.floor((maxLen - len) / 2));
 
@@ -274,10 +274,10 @@ class SteamerPlugin {
 	 * @param  {String} color [color name]
 	 * @return {String}       [msg with color]
 	 */
-    printEnd(color) {
-        var msg = '',
-            color = color || 'white',
-            maxLen = process.stdout.columns || 84;
+    printEnd(colorParam) {
+        let msg = '';
+        let color = colorParam || 'white';
+        let maxLen = process.stdout.columns || 84;
 
         msg += '='.repeat(maxLen);
 
@@ -290,9 +290,9 @@ class SteamerPlugin {
 	 * @param  {String} cmd         [command name]
 	 * @return {String}             [message]
 	 */
-    printUsage(description, cmd) {
-        var msg = chalk.green('\nusage: \n'),
-            cmd = cmd || this.pluginName.replace(this.pluginPrefix, '');
+    printUsage(description, cmdParam) {
+        let msg = chalk.green('\nusage: \n');
+        let cmd = cmdParam || this.pluginName.replace(this.pluginPrefix, '');
 
         msg += 'steamer ' + cmd + '    ' + description + '\n';
         this.info(msg);
@@ -307,18 +307,18 @@ class SteamerPlugin {
 	 - description  	{String}    option description
 	 * @return {String}         [message]
 	 */
-    printOption(options) {
-        var options = options || [];
+    printOption(optionsParam) {
+        let options = optionsParam || [];
 
-        let maxColumns = process.stdout.columns || 84,
-            maxOptionLength = 0;
+        let maxColumns = process.stdout.columns || 84;
+        let maxOptionLength = 0;
 
         let msg = chalk.green('options: \n');
 
         options.map((item) => {
-            let option = item.option || '',
-                alias = item.alias || '',
-                value = item.value || '';
+            let option = item.option || '';
+            let alias = item.alias || '';
+            let value = item.value || '';
 
             let msg = '    --' + option;
 
@@ -344,7 +344,7 @@ class SteamerPlugin {
             return item;
         });
 
-        options.map((item) => {
+        options.forEach((item) => {
             item.msg += item.description + '\n';
 
             msg += item.msg;
